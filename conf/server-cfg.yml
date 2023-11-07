@@ -1,0 +1,35 @@
+app:
+  port: 9031
+  mode: debug
+  MaxHeader: 20
+  ReadTimeOut: 2
+  WriteTimeOut: 3
+
+page:
+  pageSize: 10
+  maxPage: 20
+
+redis:
+  address:
+  pass:
+  db: 0
+  topic:
+
+mysql:
+  Address:
+  user:
+  pass:
+  db:
+  MaxIdleConn: 4
+  MaxOpenConn: 20
+
+kafka:
+  address:
+  user:
+  password:
+  webHookTopic:  t_webhook
+  durationTopic: t_duration
+  webHookGroup:  g_webhook
+  durationGroup: g_duration
+
+#  docker run -dit --log-opt max-size=10m --log-opt max-file=3 -e TZ=Asia/Shanghai --add-host=v1:xxx -p 9031:9031 --name webhook

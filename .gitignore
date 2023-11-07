@@ -1,0 +1,8 @@
+.scannerwork/
+.idea/
+.DS_Store/
+conf/server.yml
+coverage.out
+coverage.xml
+coverage.html
+webhook
