@@ -24,12 +24,12 @@ func initConfig() {
 	setting.LoadServerConfig()
 
 	models.AcquireMySQLDB(setting.Svc.Mysql)
-	redis.AcquireRedis(setting.Svc.Redis)
+	//redis.AcquireRedis(setting.Svc.Redis)
 
-	kafkaSetting := setting.Svc.Kafka
-	kafka.KWebhook = kafka.AcquireKafka(kafkaSetting.WebHookTopic, kafkaSetting.WebHookGroup)
-	kafka.KDuration = kafka.AcquireKafka(kafkaSetting.DurationTopic, kafkaSetting.DurationGroup)
-	kafka.KGeneralLog = kafka.AcquireKafka(kafkaSetting.GeneralTopic, kafkaSetting.GeneralGroup)
+	//kafkaSetting := setting.Svc.Kafka
+	//kafka.KWebhook = kafka.AcquireKafka(kafkaSetting.WebHookTopic, kafkaSetting.WebHookGroup)
+	//kafka.KDuration = kafka.AcquireKafka(kafkaSetting.DurationTopic, kafkaSetting.DurationGroup)
+	//kafka.KGeneralLog = kafka.AcquireKafka(kafkaSetting.GeneralTopic, kafkaSetting.GeneralGroup)
 
 	prometheus.MustRegister(prom.HttpRequestsTotal)
 	prometheus.MustRegister(prom.HttpRequestDuration)
@@ -82,18 +82,19 @@ func main() {
 
 func webHookConsumer(ctx context.Context) {
 	// local chan 2 redis
-	consumer.LocalQueue = make(chan *redis.DingMsgPayload, 10)
-	go consumer.FlushChan2Redis(ctx, consumer.LocalQueue)
+	consumer.LocalSonarQueue = make(chan *redis.DingMsgPayload, 20)
+	//go consumer.FlushChan2Redis(ctx, consumer.LocalSonarQueue)
+	go consumer.FlushChan2MySQL(ctx, consumer.LocalSonarQueue)
 
 	// redis consumer 2 chan
-	consumer.Redis2KQueue = make(chan *redis.DingMsgPayload, 10)
-	go consumer.RedisPubSubConsumer(ctx, consumer.Redis2KQueue)
+	//consumer.Redis2KQueue = make(chan *redis.DingMsgPayload, 10)
+	//go consumer.RedisPubSubConsumer(ctx, consumer.Redis2KQueue)
 
 	// redis 2 kafka
-	go consumer.FlushRedis2Kafka(ctx, consumer.Redis2KQueue, kafka.KWebhook)
+	//go consumer.FlushRedis2Kafka(ctx, consumer.Redis2KQueue, kafka.KWebhook)
 
 	// kafka 2 mysql
-	go consumer.KafkaReceive(ctx, kafka.KWebhook)
+	//go consumer.KafkaReceive(ctx, kafka.KWebhook)
 }
 
 func durationConsumer(ctx context.Context) {

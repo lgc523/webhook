@@ -118,7 +118,7 @@ func ReceiveWebhook(ctx *gin.Context) {
 	}
 
 	log.Printf("receive.msg:%+v", *msg)
-	go util.SendWithBackOff(ctx, msg, consumer.LocalQueue, 2, 5*time.Second)
+	go util.SendWithBackOff(ctx, msg, consumer.LocalSonarQueue, 2, 5*time.Second)
 	ctx.JSON(resp.SUCCESS, nil)
 }
 
