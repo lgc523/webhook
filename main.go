@@ -65,10 +65,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	webHookConsumer(ctx)
-
 	durationConsumer(ctx)
 
-	go consumer.KafkaReceiveGeneralLog(ctx, kafka.KGeneralLog)
+	//go consumer.KafkaReceiveGeneralLog(ctx, kafka.KGeneralLog)
 
 	signal.Notify(stopChan, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
@@ -98,9 +97,10 @@ func webHookConsumer(ctx context.Context) {
 }
 
 func durationConsumer(ctx context.Context) {
-	prom.LocalCh = make(chan *prom.DurationMsg, 20)
-	go consumer.DurationLocalChan(ctx, prom.LocalCh, kafka.KDuration)
-	go consumer.LogAppendDuration(ctx, kafka.KDuration)
+	prom.LocalDurationCh = make(chan *prom.DurationMsg, 80)
+	go consumer.DurationLocalChan2MySQL(ctx, prom.LocalDurationCh)
+	//go consumer.DurationLocalChan(ctx, prom.LocalDurationCh, kafka.KDuration)
+	//go consumer.LogAppendDuration(ctx, kafka.KDuration)
 }
 
 func release() {

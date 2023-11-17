@@ -25,7 +25,23 @@ func DurationLocalChan(ctx context.Context, localCh chan *prom.DurationMsg, k *k
 			return
 		}
 	}
+}
 
+func DurationLocalChan2MySQL(ctx context.Context, localCh chan *prom.DurationMsg) {
+	for {
+		select {
+		case dMessage := <-localCh:
+			log.Printf("DurationLocalChan.receive.msg:%+v", dMessage)
+			err := models.SaveDuration(ctx, dMessage)
+			if err != nil {
+				log.Printf("LogAppendDuration.saveModel.err:%s", err)
+				return
+			}
+		case <-ctx.Done():
+			log.Println("DurationLocalChan: context canceled, exiting...")
+			return
+		}
+	}
 }
 
 func LogAppendDuration(ctx context.Context, kfk *kk.Kfk) {

@@ -2,19 +2,20 @@ FROM golang:1.21-alpine AS builder
 
 WORKDIR  /app
 
-COPY ./ .
+COPY ./ /
 
 ENV GOPROXY https://goproxy.cn
 
 RUN time go mod download
 
 
-RUN export version=$(go version) && \
-    export buildTime=$(date -u '+%Y-%m-%d_%I:%M:%S%p') && \
-    export commit=$(git describe --long --dirty --abbrev=14) && \
-    flags "-X main.goVersion=$version -X main.buildTime=$buildTime -X main.commit=$commit" && \
+#RUN export version=$(go version) && \
+#    export buildTime=$(date -u '+%Y-%m-%d_%I:%M:%S%p') && \
+#    export commit=$(git describe --long --dirty --abbrev=14) && \
+#    flags "-X main.goVersion=$version -X main.buildTime=$buildTime -X main.commit=$commit" && \
 #    RUN /bin/sh -c 'CGO_ENABLED=0 GOOS=linux time go build -p 4 -ldflags "$flags" -a -o webhook main.go'
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "$flags" -a -o webhook main.go
+RUN #CGO_ENABLED=0 GOOS=linux go build -ldflags "$flags" -a -o webhook main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o webhook main.go
 
 FROM golang:1.21-alpine
 

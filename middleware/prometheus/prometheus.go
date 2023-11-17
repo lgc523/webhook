@@ -25,7 +25,7 @@ var (
 		},
 		[]string{"method", "endpoint"},
 	)
-	LocalCh chan *DurationMsg
+	LocalDurationCh chan *DurationMsg
 )
 
 type DurationMsg struct {
@@ -51,7 +51,7 @@ func TimeDuration(c *gin.Context) {
 		CreateAt: time.Now(),
 	}
 	if c.FullPath() != "/metrics" {
-		go util.SendWithBackOff(c, dMessage, LocalCh, 2, 10*time.Second)
+		go util.SendWithBackOff(c, dMessage, LocalDurationCh, 2, 10*time.Second)
 	}
 	HttpRequestDuration.WithLabelValues(c.Request.Method, c.FullPath()).Observe(duration)
 }

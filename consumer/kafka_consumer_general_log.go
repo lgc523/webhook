@@ -25,21 +25,31 @@ func KafkaReceiveGeneralLog(ctx context.Context, k *kfk.Kfk) {
 				return
 			}
 			//log.Printf("KafkaReceiveGeneralLog.message:%s", message.Value)
-			m := make(map[string]any)
+			var m map[string]interface{}
 			err = sonic.Unmarshal(message.Value, &m)
 			if err != nil {
 				log.Printf("sonic.unmarshal.err:%s", err.Error())
-			} else {
-				originMsg := m["message"].(string)
-				logMessage, err := parseGeneralLogMessage(originMsg)
-				if err != nil {
-					log.Printf("KafkaReceiveGeneralLog.parseGeneralLogMessage.err:%s", err.Error())
+				continue
+			}
+
+			originMsg, ok := m["message"].(string)
+			if !ok {
+				log.Printf("KafkaReceiveGeneralLog: invalid message type")
+				continue
+			}
+
+			logMessage, err := parseGeneralLogMessage(originMsg)
+			if err != nil {
+				log.Printf("KafkaReceiveGeneralLog.parseGeneralLogMessage.err:%s", err.Error())
+				continue
+			}
+
+			if logMessage != nil {
+				if err := logMessage.SaveGeneralLog(ctx, models.MysqlFd); err != nil {
+					log.Printf("KafkaReceiveGeneralLog.SaveGeneralLog.err:%s", err.Error())
 				} else {
-					if logMessage != nil {
-						_ = logMessage.SaveGeneralLog(ctx, models.MysqlFd)
-						if err = k.Reader.CommitMessages(ctx, message); err != nil {
-							log.Printf("KafkaReceiveGeneralLog.commit.err:%s", err.Error())
-						}
+					if err = k.Reader.CommitMessages(ctx, message); err != nil {
+						log.Printf("KafkaReceiveGeneralLog.commit.err:%s", err.Error())
 					}
 				}
 			}

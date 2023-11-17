@@ -3,6 +3,7 @@ package consumer
 import (
 	"context"
 	"log"
+	"webhook/middleware/ding"
 	"webhook/middleware/redis"
 	"webhook/models"
 	"webhook/pkg/setting"
@@ -28,6 +29,7 @@ func FlushChan2MySQL(ctx context.Context, ch chan *redis.DingMsgPayload) {
 		select {
 		case msg := <-ch:
 			_ = models.SaveWebHooks(msg)
+			_ = ding.SendDing(msg, ding.DingToken, msg.ProjectKey)
 		case <-ctx.Done():
 			log.Printf("FlushChan2MySQL context canceled, exiting...")
 			return
