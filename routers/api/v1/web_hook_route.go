@@ -66,7 +66,11 @@ func ReceiveWebhook(ctx *gin.Context) {
 	}
 
 	analysedAt := sonarJson["analysedAt"].(string)
-	commitHash := sonarJson["revision"].(string)
+	reversionOpt := sonarJson["revision"]
+	var commitHash string
+	if reversionOpt != nil {
+		commitHash = reversionOpt.(string)
+	}
 	taskId := sonarJson["taskId"].(string)
 	alertStatus := sonarJson["status"].(string)
 
